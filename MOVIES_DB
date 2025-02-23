@@ -1,0 +1,184 @@
+CREATE DATABASE MoviesDB;
+GO
+USE MoviesDB;
+GO
+
+-- Users Table
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY IDENTITY(1,1),
+    first_name NVARCHAR(50),
+    last_name NVARCHAR(50),
+    email NVARCHAR(100) UNIQUE,
+    password_hash NVARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    is_active BIT DEFAULT 1
+);
+GO
+
+-- Subscriptions Table
+CREATE TABLE Subscriptions (
+    subscription_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    plan_type NVARCHAR(50),
+    monthly_fee DECIMAL(10,2),
+    start_date DATETIME,
+    end_date DATETIME,
+    is_active BIT DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+GO
+
+-- Genres Table
+CREATE TABLE Genres (
+    genre_id INT PRIMARY KEY IDENTITY(1,1),
+    name NVARCHAR(50),
+    description NVARCHAR(MAX)
+);
+GO
+
+-- Age Ratings Table
+CREATE TABLE AgeRatings (
+    rating_id INT PRIMARY KEY IDENTITY(1,1),
+    code NVARCHAR(10),
+    description NVARCHAR(MAX)
+);
+GO
+
+-- Movies Table
+CREATE TABLE Movies (
+    movie_id INT PRIMARY KEY IDENTITY(1,1),
+    title NVARCHAR(255),
+    release_year INT,
+    duration_mins INT,
+    description NVARCHAR(MAX),
+    genre_id INT,
+    rating_id INT,
+    cover_image_url NVARCHAR(255),
+    added_date DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (genre_id) REFERENCES Genres(genre_id),
+    FOREIGN KEY (rating_id) REFERENCES AgeRatings(rating_id)
+);
+GO
+
+-- Reviews Table
+CREATE TABLE Reviews (
+    review_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    movie_id INT,
+    rating INT,
+    comment NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+GO
+
+-- Watch History Table
+CREATE TABLE WatchHistory (
+    history_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    movie_id INT,
+    watched_at DATETIME DEFAULT GETDATE(),
+    watch_duration INT,
+    completed BIT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+GO
+
+-- Watch List Table
+CREATE TABLE WatchList (
+    watchlist_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    movie_id INT,
+    added_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+GO
+
+
+-- Insert Users
+INSERT INTO Users (first_name, last_name, email, password_hash, created_at, is_active) 
+VALUES 
+('Rahul', 'Kumar', 'rahul.k@email.com', 'hash1', '2024-01-01', 1),
+('Priya', 'Sharma', 'priya.s@email.com', 'hash2', '2024-01-02', 1),
+('Arun', 'Patel', 'arun.p@email.com', 'hash3', '2024-01-03', 1),
+('Deepa', 'Reddy', 'deepa.r@email.com', 'hash4', '2024-01-04', 1),
+('Karthik', 'Iyer', 'karthik.i@email.com', 'hash5', '2024-01-05', 1),
+('Meghana', 'Das', 'meghana.d@email.com', 'hash6', '2024-01-06', 1),
+('Ravi', 'Teja', 'ravi.t@email.com', 'hash7', '2024-01-07', 1),
+('Sanjana', 'Nair', 'sanjana.n@email.com', 'hash8', '2024-01-08', 1),
+('Vikram', 'Singh', 'vikram.s@email.com', 'hash9', '2024-01-09', 1),
+('Pooja', 'Verma', 'pooja.v@email.com', 'hash10', '2024-01-10', 1);
+
+-- Insert Subscriptions
+INSERT INTO Subscriptions (user_id, plan_type, monthly_fee, start_date, end_date, is_active)
+VALUES
+(1, 'Basic', 199.99, '2024-01-10', '2024-02-10', 1),
+(2, 'Premium', 399.99, '2024-01-15', '2024-02-15', 1),
+(3, 'Basic', 199.99, '2024-01-20', '2024-02-20', 1),
+(4, 'Standard', 299.99, '2024-01-25', '2024-02-25', 1),
+(5, 'Premium', 399.99, '2024-02-01', '2024-03-01', 1);
+
+-- Insert Genres
+INSERT INTO Genres (name, description) 
+VALUES 
+('Action', 'High-energy movies with intense scenes'),
+('Drama', 'Emotional and thought-provoking movies'),
+('Comedy', 'Movies full of humor and fun'),
+('Thriller', 'Suspenseful and exciting films'),
+('Fantasy', 'Movies with supernatural elements');
+
+-- Insert Age Ratings
+INSERT INTO AgeRatings (code, description)
+VALUES
+('U', 'Suitable for all age groups'),
+('UA', 'Parental guidance recommended for children under 12'),
+('A', 'Restricted to adults');
+
+-- Insert Movies (Top Telugu Movies)
+INSERT INTO Movies (title, release_year, duration_mins, description, genre_id, rating_id, cover_image_url, added_date)
+VALUES
+('RRR', 2022, 187, 'Epic action drama directed by S.S. Rajamouli', 1, 2, 'rrr.jpg', '2024-01-10'),
+('Pushpa', 2021, 179, 'Action thriller about a sandalwood smuggler', 1, 2, 'pushpa.jpg', '2024-01-11'),
+('Baahubali', 2015, 159, 'Fantasy epic about a lost prince', 5, 2, 'baahubali.jpg', '2024-01-12'),
+('Ala Vaikunthapurramuloo', 2020, 165, 'Family drama starring Allu Arjun', 2, 2, 'ava.jpg', '2024-01-13'),
+('Jersey', 2019, 157, 'Emotional sports drama', 2, 2, 'jersey.jpg', '2024-01-14');
+
+-- Insert Reviews
+INSERT INTO Reviews (user_id, movie_id, rating, comment, created_at)
+VALUES
+(1, 1, 5, 'Amazing movie with great action!', '2024-02-01'),
+(2, 2, 4, 'Loved the performance by Allu Arjun!', '2024-02-02'),
+(3, 3, 5, 'Baahubali is a masterpiece!', '2024-02-03'),
+(4, 4, 4, 'Ala Vaikunthapurramuloo was entertaining', '2024-02-04'),
+(5, 5, 5, 'Jersey is an emotional ride!', '2024-02-05');
+
+-- Insert Watch History
+INSERT INTO WatchHistory (user_id, movie_id, watched_at, watch_duration, completed)
+VALUES
+(1, 1, '2024-02-05', 187, 1),
+(2, 2, '2024-02-06', 120, 0),
+(3, 3, '2024-02-07', 159, 1),
+(4, 4, '2024-02-08', 90, 0),
+(5, 5, '2024-02-09', 157, 1);
+
+-- Insert Watch List
+INSERT INTO WatchList (user_id, movie_id, added_at)
+VALUES
+(1, 2, '2024-02-10'),
+(2, 3, '2024-02-11'),
+(3, 4, '2024-02-12'),
+(4, 5, '2024-02-13'),
+(5, 1, '2024-02-14');
+
+-- Verify Data
+SELECT * FROM Users;
+SELECT * FROM Subscriptions;
+SELECT * FROM Genres;
+SELECT * FROM AgeRatings;
+SELECT * FROM Movies;
+SELECT * FROM Reviews;
+SELECT * FROM WatchHistory;
+SELECT * FROM WatchList;
