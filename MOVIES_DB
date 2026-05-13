@@ -6,7 +6,7 @@ GO
 -- Users Table
 CREATE TABLE Users (
     user_id INT PRIMARY KEY IDENTITY(1,1),
-    first_name NVARCHAR(60),
+    first_name NVARCHAR(50),
     last_name NVARCHAR(50),
     email NVARCHAR(100) UNIQUE,
     password_hash NVARCHAR(255),
